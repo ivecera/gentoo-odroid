@@ -17,7 +17,7 @@ S="${WORKDIR}/${MY_P}"
 LICENSE="GPL-2+ GPL-3+ ZLIB MIT CC-BY-SA-2.0 CC-BY-SA-3.0"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64 ~x86"
-IUSE="debug"
+IUSE="debug opengl"
 
 # =media-libs/libsdl2-2.0.14-r0 can cause supertux binary to move entire
 # content of ${HOME} to ${HOME}/.local/share/supertux2/
@@ -27,14 +27,16 @@ RDEPEND="
 	>=dev-games/physfs-3.0
 	dev-libs/boost:=[nls]
 	media-libs/freetype
-	media-libs/glew:=
 	media-libs/libpng:0=
 	>=media-libs/libsdl2-2.0.1[joystick,video]
 	media-libs/libvorbis
 	media-libs/openal
 	>=media-libs/sdl2-image-2.0.0[png,jpeg]
 	>=net-misc/curl-7.21.7
-	virtual/opengl
+	opengl? (
+		media-libs/glew:=
+		virtual/opengl
+	)
 "
 DEPEND="${RDEPEND}
 	media-libs/glm"
@@ -56,6 +58,7 @@ src_configure() {
 		-DINSTALL_SUBDIR_BIN=bin
 		-DINSTALL_SUBDIR_DOC=share/doc/${PF}
 		-DINSTALL_SUBDIR_SHARE=share/${PN}2
+		-DENABLE_OPENGL="$(usex opengl)"
 		-DENABLE_SQDBG="$(usex debug)"
 		-DUSE_SYSTEM_PHYSFS=ON
 		-DIS_SUPERTUX_RELEASE=ON
