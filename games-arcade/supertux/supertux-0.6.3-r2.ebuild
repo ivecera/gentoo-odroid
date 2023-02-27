@@ -17,7 +17,7 @@ S="${WORKDIR}/${MY_P}"
 LICENSE="GPL-2+ GPL-3+ ZLIB MIT CC-BY-SA-2.0 CC-BY-SA-3.0"
 SLOT="0"
 KEYWORDS="~amd64 ~arm64 ~x86"
-IUSE="debug opengl"
+IUSE="debug gles2-only opengl"
 
 # =media-libs/libsdl2-2.0.14-r0 can cause supertux binary to move entire
 # content of ${HOME} to ${HOME}/.local/share/supertux2/
@@ -34,14 +34,23 @@ RDEPEND="
 	>=media-libs/sdl2-image-2.0.0[png,jpeg]
 	>=net-misc/curl-7.21.7
 	opengl? (
-		media-libs/glew:=
-		virtual/opengl
+		gles2-only? (
+			media-libs/mesa[gles2]
+		)
+		!gles2-only? (
+			media-libs/glew:=
+			virtual/opengl
+		)
 	)
 "
 DEPEND="${RDEPEND}
 	media-libs/glm"
 BDEPEND="
 	virtual/pkgconfig
+"
+
+REQUIRED_USE="
+	gles2-only? ( opengl )
 "
 
 PATCHES=(
@@ -59,6 +68,7 @@ src_configure() {
 		-DINSTALL_SUBDIR_DOC=share/doc/${PF}
 		-DINSTALL_SUBDIR_SHARE=share/${PN}2
 		-DENABLE_OPENGL="$(usex opengl)"
+		-DENABLE_OPENGLES2="$(usex gles2-only)"
 		-DENABLE_SQDBG="$(usex debug)"
 		-DUSE_SYSTEM_PHYSFS=ON
 		-DIS_SUPERTUX_RELEASE=ON
